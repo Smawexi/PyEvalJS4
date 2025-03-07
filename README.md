@@ -9,6 +9,13 @@
 
 ---
 
+### Installation
+```text
+pip install pyevaljs4
+```
+
+---
+
 ### Quickstart
 ```python
 import pyevaljs4
