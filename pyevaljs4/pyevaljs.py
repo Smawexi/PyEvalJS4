@@ -18,6 +18,13 @@ from .settings import ASYNC_CALL_FLAGS
 _logger = logging.getLogger('pyevaljs4')
 
 
+def _close(path: str, node) -> None:
+    os.remove(path)
+    node.stdin.close()
+    node.stdout.close()
+    node.wait()
+
+
 class RunTime:
 
     def __init__(self):
@@ -29,23 +36,22 @@ class RunTime:
         self._lock = threading.Lock()
 
     def _init(self):
-        with self._lock:
-            if not self._initialize:
-                try:
-                    self._node = subprocess.Popen(
-                        [self._node_env, self._path],
-                        stdin=subprocess.PIPE,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        universal_newlines=True,
-                        encoding='utf-8'
-                    )
-                except Exception as e:
-                    os.remove(self._path)
-                    raise RunTimeNotFoundException("RunTime(nodejs) not found error") from e
+        if not self._initialize:
+            try:
+                self._node = subprocess.Popen(
+                    [self._node_env, self._path],
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
+                    encoding='utf-8'
+                )
+            except Exception as e:
+                os.remove(self._path)
+                raise RunTimeNotFoundException("RunTime(nodejs) not found error") from e
 
-                self._finalizer = weakref.finalize(self, self._close)
-                self._initialize = True
+            self._finalizer = weakref.finalize(self, _close, self._path, self._node)
+            self._initialize = True
 
     @classmethod
     def _compile(cls, source: str, suffix: str):
@@ -118,12 +124,6 @@ class RunTime:
                 continue
 
             return _result
-
-    def _close(self):
-        os.remove(self._path)
-        self._node.stdin.close()
-        self._node.stdout.close()
-        self._node.wait()
 
     def close(self):
         self._finalizer()
