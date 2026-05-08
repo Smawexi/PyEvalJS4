@@ -1,1 +1,1 @@
-version = ".".join(map(str, (0, 2, 0)))
+version = ".".join(map(str, (0, 2, 1)))
