@@ -4,12 +4,13 @@ from .pyevaljs import RunTime, JSException, RunTimeNotFoundException
 from .__version__ import version
 
 
-def compile_(js_code: str = None, mode: str = None):
+def compile_(js_code: str = None, mode: str = None, cwd: str = None):
     """
     Compile js code
     :param js_code: js source code
     :param mode: Execution mode, the default is '.js', meaning it will execute with '.js' behavior.
                 Other optional values include '.cjs' and '.mjs', etc.
+    :param cwd: Working directory path
     :return: RunTime
     """
     if js_code is None:
@@ -18,4 +19,4 @@ def compile_(js_code: str = None, mode: str = None):
     if mode is None:
         mode = ".js"
 
-    return RunTime._compile(js_code, mode)
+    return RunTime._compile(js_code, mode, cwd)

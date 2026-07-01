@@ -31,6 +31,7 @@ class RunTime:
         self._node = None
         self._node_env = get_node_env()
         self._path = None
+        self._cwd = None
         self._initialize = False
         self._finalizer = None
         self._lock = threading.Lock()
@@ -44,7 +45,8 @@ class RunTime:
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     universal_newlines=True,
-                    encoding='utf-8'
+                    encoding='utf-8',
+                    cwd=self._cwd
                 )
             except Exception as e:
                 os.remove(self._path)
@@ -54,11 +56,18 @@ class RunTime:
             self._initialize = True
 
     @classmethod
-    def _compile(cls, source: str, suffix: str):
+    def _compile(cls, source: str, suffix: str, cwd: str = None):
         self = cls()
-        fd, path = tempfile.mkstemp(suffix=suffix, dir='.')
+        self._cwd = cwd
+        if self._cwd is None:
+            _dir = "."
+        else:
+            _dir = self._cwd
+
+        fd, path = tempfile.mkstemp(suffix=suffix, dir=_dir)
         with open(fd, 'w', encoding='utf-8') as fp:
             fp.write(NODE_PROGRAM.format(source=json.dumps(source)))
+
         self._path = path
         self._init()
         return self
