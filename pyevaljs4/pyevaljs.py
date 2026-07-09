@@ -97,11 +97,11 @@ class RunTime:
         return self._call(func, _args, async_js_func)
 
     def _call(self, func: str, args: list, async_js_func=False):
-        args = str(args).replace("True", "true").replace("False", "false")
+        _args = json.dumps(args, ensure_ascii=False)
         if async_js_func:
-            statement = ASYNC_CALL.format(flags=ASYNC_CALL_FLAGS, func=func, args=args)
+            statement = ASYNC_CALL.format(flags=ASYNC_CALL_FLAGS, func=func, args=_args)
         else:
-            statement = SYNC_CALL.format(func=func, args=args)
+            statement = SYNC_CALL.format(func=func, args=_args)
 
         return self._execute(statement=statement)
 
