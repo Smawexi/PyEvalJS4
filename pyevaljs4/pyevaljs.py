@@ -50,7 +50,7 @@ class RunTime:
                 )
             except Exception as e:
                 os.remove(self._path)
-                raise RunTimeNotFoundException("RunTime(nodejs) not found error") from e
+                raise RunTimeNotFoundException(f"RunTime(nodejs) not found error, current use Node path: {self._node_env}, error: {repr(e)}")
 
             self._finalizer = weakref.finalize(self, _close, self._path, self._node)
             self._initialize = True
